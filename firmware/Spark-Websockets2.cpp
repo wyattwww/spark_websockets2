@@ -370,9 +370,11 @@ void WebSocketClient::sendHandshake(const char* hostname, const char* path, cons
 
 	handshake.concat(WebSocketClientStringTable);
 
+  std::string portStr = std::to_string(_port);
+
 	handshake.replace("{0}",path);
 	handshake.replace("{1}",hostname);
-	handshake.replace("{2}",(const char*)_port);
+	handshake.replace("{2}",(const char*)portStr.c_str());
 
 	//trying to generate hash, now - fails.
 	generateHash(_key,45);
