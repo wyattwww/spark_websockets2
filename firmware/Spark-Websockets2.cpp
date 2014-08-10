@@ -80,9 +80,9 @@
 
 
 
-//#define HANDSHAKE
-//#define DEBUG
-//#define TRACE
+#define HANDSHAKE
+#define DEBUG
+#define TRACE
 
 
 const char *WebSocketClientStringTable = {
