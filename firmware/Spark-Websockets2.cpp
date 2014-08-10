@@ -89,7 +89,7 @@ const char *WebSocketClientStringTable = {
 			"GET {0} HTTP/1.1\x0d\x0a"
 			"Upgrade: websocket\x0d\x0a"
 			"Connection: Upgrade\x0d\x0a"
-			"Host: {1}:{2}\x0d\x0a"
+			"Host: {1}\x0d\x0a"
 			"Origin: SparkWebSocketClient\x0d\x0a"
 			"Sec-WebSocket-Key:  1VTFj/CydlBCZDucDqw8eA==\x0d\x0a"
 			"Sec-WebSocket-Version: 13\x0d\x0a"
@@ -370,11 +370,9 @@ void WebSocketClient::sendHandshake(const char* hostname, const char* path, cons
 
 	handshake.concat(WebSocketClientStringTable);
 
-  std::string portStr = std::to_string(_port);
-
-	handshake.replace("{0}",path);
+  handshake.replace("{0}",path);
 	handshake.replace("{1}",hostname);
-	handshake.replace("{2}",(const char*)portStr.c_str());
+	//handshake.replace("{2}",(const char*)_port);
 
 	//trying to generate hash, now - fails.
 	generateHash(_key,45);
