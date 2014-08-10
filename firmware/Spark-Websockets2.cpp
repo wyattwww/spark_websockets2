@@ -150,16 +150,21 @@ byte WebSocketClient::nextByte() {
 }
 
 void WebSocketClient::monitor () {
-  
+  Serial.println( "monitor entered" );
+      
   if(!_canConnect) {
+    Serial.println( "monitor can not connect!" );
     return;
   }
   
   if(_reconnecting) {
+    Serial.println( "monitor reconnecting..." );
     return;
   }
   
   if(!connected() && millis() > _retryTimeout) {
+    Serial.println( "monitor attempting to reconnect" );
+    
     _retryTimeout = millis() + RETRY_TIMEOUT;
     _reconnecting = true;
     reconnect();
@@ -375,8 +380,8 @@ void WebSocketClient::sendHandshake(const char* hostname, const char* path, cons
 	//handshake.replace("{2}",(const char*)_port);
 
 	//trying to generate hash, now - fails.
-	generateHash(_key,45);
-	Serial.println(_key);
+	//generateHash(_key,45);
+	//Serial.println(_key);
 
 	_client.print(handshake); 
 #ifdef HANDSHAKE
@@ -442,6 +447,7 @@ void WebSocketClient::readLine(char* buffer) {
 
 bool WebSocketClient::send (char* message) {
   if(!_canConnect || _reconnecting) {
+    Serial.println( "Send not connected!" );
     return false;
   }
   int len = strlen(message);
