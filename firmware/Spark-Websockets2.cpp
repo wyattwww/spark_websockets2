@@ -81,7 +81,7 @@
 
 
 #define HANDSHAKE
-#define DEBUG
+//#define DEBUG
 #define TRACE
 
 
