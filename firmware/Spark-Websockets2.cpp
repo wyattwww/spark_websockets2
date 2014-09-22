@@ -150,20 +150,28 @@ byte WebSocketClient::nextByte() {
 }
 
 void WebSocketClient::monitor () {
+#ifdef DEBUG
   Serial.println( "monitor entered" );
-      
+#endif
+
   if(!_canConnect) {
+#ifdef DEBUG
     Serial.println( "monitor can not connect!" );
+#endif
     return;
   }
   
   if(_reconnecting) {
+#ifdef DEBUG
     Serial.println( "monitor reconnecting..." );
+#endif
     return;
   }
   
   if(!connected() && millis() > _retryTimeout) {
+#ifdef DEBUG
     Serial.println( "monitor attempting to reconnect" );
+#endif
     
     _retryTimeout = millis() + RETRY_TIMEOUT;
     _reconnecting = true;
@@ -370,7 +378,9 @@ void WebSocketClient::onError(OnError fn) {
 
 
 void WebSocketClient::sendHandshake(const char* hostname, const char* path, const char* protocol) {
+#ifdef HANDSHAKE
 	Serial.println("Sending handshake!");  
+#endif
 	String handshake = "";
 
 	handshake.concat(WebSocketClientStringTable);
@@ -428,7 +438,9 @@ Serial.println("Handshake Failed! Terminating");
   }
   else
 	{
+#ifdef DEBUG
 	  Serial.println("Handshake Ok!");
+#endif
 	}
   return result;
 }
@@ -447,7 +459,9 @@ void WebSocketClient::readLine(char* buffer) {
 
 bool WebSocketClient::send (char* message) {
   if(!_canConnect || _reconnecting) {
+#ifdef DEBUG
     Serial.println( "Send not connected!" );
+#endif
     return false;
   }
   int len = strlen(message);
@@ -463,7 +477,9 @@ bool WebSocketClient::send (char* message) {
     _client.write((byte)0x00); // use 0x00 for mask bytes which is effectively a NOOP
   }
   _client.print(message);
+#ifdef DEBUG 
   Serial.println(message);
+#endif
   return true;
 }
 
