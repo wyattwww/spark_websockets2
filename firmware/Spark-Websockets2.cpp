@@ -114,7 +114,7 @@ void WebSocketClient::reconnect() {
   }
   if(!result) {
     
-#ifdef DEBUG
+#ifdef DEBUGTRACE
     Serial.println("Connection Failed!");
 #endif
     if(_onError != NULL) {
@@ -140,7 +140,7 @@ byte WebSocketClient::nextByte() {
   while(_client.available() == 0);
   byte b = _client.read();
   
-#ifdef DEBUG
+#ifdef DEBUGTRACE
   if(b < 0) {
     Serial.println("Internal Error in Ethernet Client Library (-1 returned where >= 0 expected)");
   }
@@ -150,26 +150,26 @@ byte WebSocketClient::nextByte() {
 }
 
 void WebSocketClient::monitor () {
-#ifdef DEBUG
+#ifdef DEBUGTRACE
   Serial.println( "monitor entered" );
 #endif
 
   if(!_canConnect) {
-#ifdef DEBUG
+#ifdef DEBUGTRACE
     Serial.println( "monitor can not connect!" );
 #endif
     return;
   }
   
   if(_reconnecting) {
-#ifdef DEBUG
+#ifdef DEBUGTRACE
     Serial.println( "monitor reconnecting..." );
 #endif
     return;
   }
   
   if(!connected() && millis() > _retryTimeout) {
-#ifdef DEBUG
+#ifdef DEBUGTRACE
     Serial.println( "monitor attempting to reconnect" );
 #endif
     
@@ -224,7 +224,7 @@ Serial.println(len);
     
     if(mask) {
       
-#ifdef DEBUG
+#ifdef DEBUGTRACE
 Serial.println("Masking not yet supported (RFC 6455 section 5.3)");
 #endif
       
@@ -290,7 +290,7 @@ Serial.println("Masking not yet supported (RFC 6455 section 5.3)");
     switch(opCode) {
       case 0x00:
         
-#ifdef DEBUG
+#ifdef DEBUGTRACE
 	Serial.println("Unexpected Continuation OpCode");
 #endif
         
@@ -298,7 +298,7 @@ Serial.println("Masking not yet supported (RFC 6455 section 5.3)");
         
       case 0x01:
         
-#ifdef DEBUG
+#ifdef DEBUGTRACE
 	Serial.print("onMessage: data = ");
 	Serial.println(_packet);
 #endif
@@ -310,7 +310,7 @@ Serial.println("Masking not yet supported (RFC 6455 section 5.3)");
         
       case 0x02:
         
-#ifdef DEBUG
+#ifdef DEBUGTRACE
 Serial.println("Binary messages not yet supported (RFC 6455 section 5.6)");
 #endif
         
@@ -321,7 +321,7 @@ Serial.println("Binary messages not yet supported (RFC 6455 section 5.6)");
         
       case 0x09:
         
-#ifdef DEBUG
+#ifdef DEBUGTRACE
 	Serial.print("onPing");
 #endif
         
@@ -331,7 +331,7 @@ Serial.println("Binary messages not yet supported (RFC 6455 section 5.6)");
         
       case 0x0A:
         
-#ifdef DEBUG
+#ifdef DEBUGTRACE
 	Serial.print("onPong");
 #endif
         
@@ -341,7 +341,7 @@ Serial.println("Binary messages not yet supported (RFC 6455 section 5.6)");
         
         unsigned int code = ((byte)_packet[0] << 8) + (byte)_packet[1];
         
-#ifdef DEBUG
+#ifdef DEBUGTRACE
 		Serial.print("onClose: code = ");
 		Serial.print(code);
 		Serial.print("; message = ");
@@ -431,14 +431,14 @@ bool WebSocketClient::readHandshake() {
   }
 
   if(!result) {
-#ifdef DEBUG
+#ifdef DEBUGTRACE
 Serial.println("Handshake Failed! Terminating");
 #endif
     _client.stop();
   }
   else
 	{
-#ifdef DEBUG
+#ifdef DEBUGTRACE
 	  Serial.println("Handshake Ok!");
 #endif
 	}
@@ -459,7 +459,7 @@ void WebSocketClient::readLine(char* buffer) {
 
 bool WebSocketClient::send (char* message) {
   if(!_canConnect || _reconnecting) {
-#ifdef DEBUG
+#ifdef DEBUGTRACE
     Serial.println( "Send not connected!" );
 #endif
     return false;
@@ -477,7 +477,7 @@ bool WebSocketClient::send (char* message) {
     _client.write((byte)0x00); // use 0x00 for mask bytes which is effectively a NOOP
   }
   _client.print(message);
-#ifdef DEBUG 
+#ifdef DEBUGTRACE 
   Serial.println(message);
 #endif
   return true;
