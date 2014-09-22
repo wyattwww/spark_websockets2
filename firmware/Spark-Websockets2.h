@@ -29,7 +29,7 @@
 
 #define HANDSHAKE // uncomment to print out the sent and received handshake messages
 #define TRACE // uncomment to support TRACE level debugging of wire protocol
-#define DEBUG // turn on debugging
+//#define DEBUG // turn on debugging
 
 #define RETRY_TIMEOUT 3000
 
