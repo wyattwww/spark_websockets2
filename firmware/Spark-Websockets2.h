@@ -3,7 +3,7 @@
  Copyright 2011 Kevin Rohling
  Copyright 2012 Ian Moore
  Copyright 2014 Ivan Davletshin
-
+ Copyright 2014 Matthew Goodman
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -27,10 +27,6 @@
 #ifndef WEBSOCKETCLIENT_H
 #define WEBSOCKETCLIENT_H
 
-//#define HANDSHAKE // uncomment to print out the sent and received handshake messages
-#define TRACE // uncomment to support TRACE level debugging of wire protocol
-#define DEBUG // turn on debugging
-
 #define RETRY_TIMEOUT 3000
 
 #include <stdlib.h>
@@ -42,40 +38,74 @@ public:
   typedef void (*OnOpen)(WebSocketClient client);
   typedef void (*OnClose)(WebSocketClient client, int code, char* message);
   typedef void (*OnError)(WebSocketClient client, char* message);
-  void connect(const char hostname[], int port = 80, const char protocol[] = NULL, const char path[] = "/");
+
+  void connect(const char hostname[], int port, const char protocol[], const char path[]);
+  void connect(IPAddress ipAddy, const char hostname[], int port, const char protocol[], const char path[]);
+
+//  void connect(const char hostname[], int port = 80, const char protocol[] = NULL, const char path[] = "/");
+//  void connect(UINT32 ipAddress, const char hostname[], int port = 80, const char protocol[] = NULL, const char path[] = "/");
   bool connected();
   void disconnect();
   void monitor();
-  void onOpen(OnOpen function);
-  void onClose(OnClose function);
-  void onMessage(OnMessage function);
-  void onError(OnError function);
   bool send(char* message);
+
+  void setOnOpen(OnOpen function);
+  void setOnClose(OnClose function);
+  void setOnMessage(OnMessage function);
+  void setOnError(OnError function);
 private:
   const char* _hostname;
+  IPAddress _ipAddress;
   int _port;
   const char* _path;
   const char* _protocol;
-  char _key[45];
-  bool _canConnect;
+
+  TCPClient _client;
+
+  bool _configured;
   bool _reconnecting;
   unsigned long _retryTimeout;
-  void reconnect();
-  void sendHandshake(const char* hostname, const char* path, const char* protocol);
-  TCPClient _client;
+
+  void _reconnect();
+  void _restartConnection();
+  void _sendHandshake(const char* hostname, const char* path);
+  bool _readHandshake();
+
+  // Security/handshare validataion
+  char _key[45];
+  void generateHash(char* buffer, size_t bufferlen);
+  size_t base64Encode(byte* src, size_t srclength, char* target, size_t targetsize);
+  
+  // User provided callback storage
   OnOpen _onOpen;
   OnClose _onClose;
   OnMessage _onMessage;
   OnError _onError;
+  
+  // Internal handles to callbacks w/ NULL checks
+  void _callOnMessage(char*);
+  void _callOnOpen();
+  void _callOnClose(unsigned int, char*);
+  void _callOnError(char*);
+  
+  // The current transaction data, length and opcode 
+  byte _opCode;
   char* _packet;
   unsigned int _packetLength;
-  byte _opCode;
-  bool readHandshake();
-  void readLine(char* buffer);
-  void generateHash(char* buffer, size_t bufferlen);
-  size_t base64Encode(byte* src, size_t srclength, char* target, size_t targetsize);
-  byte nextByte();
-  
+  void _freePacket();
+
+
+  // TCP/io calls
+  byte _nextByte();
+  void _readNBytes(char*, int);
+  void _readNBytes(char*, int, char*, int);
+  void _readLine(char* buffer);
+  void _appendFrameData(int, char*, bool);
+
+  // Debugging/reporting tools
+  void _dbPrint(char*);
+  void _dbPrint(String);
+  void _errState(char*);
 };
 
 const char b64Alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
