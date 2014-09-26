@@ -27,7 +27,7 @@
 #include "spark_wiring_usbserial.h"
 #include "spark_wiring_string.h"
 
-#include "Spark-Websockets2.cpp"
+#include "Spark-Websockets2.h"
 #include <stdlib.h>
 #include <string.h>
 
